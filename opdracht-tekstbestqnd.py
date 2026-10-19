@@ -1,48 +1,54 @@
-import time
 import board
 import adafruit_dht
-import sys
-import spidev
-
-spi = spidev.SpiDev()
-spi.open(0, 0)
+from gpiozero import MCP3008
+from time import sleep
+teller = 0
+ 
 dhtDevice = adafruit_dht.DHT11(board.D18)
-
-def read_adc(channel):
-    adc = spi.xfer2([1, (8 + channel) << 4, 0])
-    data = ((adc[1] & 3) << 8) + adc[2]
-    return data
-
-def convertVolts(data):
-    volts = (100 * 3.3) / float(1023)
-    volts = round(volts, 4)
-    return volts
-
-def convertTemp(volts):
-    temp = (100 * volts) - 50
-    temp = round(temp, 4)
-    return temp
-
 while True:
-    try:
-        temperature_c = dhtDevice.temperature
-        temperature_f = temperature_c * (9 / 5) + 32
-        humidity = dhtDevice.humidity
-        print(f"Temp: {temperature_c:.1f} C / {temperature_f:.1f} F    Humidity: {humidity}% ")
-
-        data = read_adc(0)
-        print("adc   : {:8}".format(data))
-        volts = convertVolts(data)
-        temp = convertTemp(volts)
-        print("volts : {:8.2f}".format(volts))
-        print("temp  : {:8.2f}".format(temp))
-
-    except RuntimeError as error:
-        print(error.args[0])
-        time.sleep(2.0)
-        continue
-    except Exception as error:
-        dhtDevice.exit()
-        raise error
-    time.sleep(5.0)
-    
+       
+        try:
+            temp_dht = dhtDevice.temperature
+            temp_f = temp_dht * (9/5) + 32
+            humidity = dhtDevice.humidity
+               
+       
+        except RuntimeError as error:
+                print( error.args[0])
+                sleep(2.0)
+                continue
+        except Exception as error:
+                dhtDevice.exit()
+                raise error
+       
+        sleep(2.0)
+       
+ 
+        Digi_waarde = MCP3008(channel = 0)
+        spannings_waarde = (Digi_waarde.value / 1) * 3.3
+        sleep(1)
+ 
+        temp_TMP = (spannings_waarde - 0.5) /  0.01
+       
+        print(f"{temp_dht}°C --> DHT")
+       
+        print(f":{temp_TMP}°C --> TMP36")
+ 
+        verschil = temp_dht-temp_TMP
+        gemiddelde = (temp_dht+temp_TMP)/2
+ 
+ 
+ 
+ 
+        f = open("mijndata.csv","a")
+        teller = teller + 1
+        f.write(f"{teller}:{temp_TMP:.1f},{temp_dht:.1f},{gemiddelde:.1f},{verschil:.1f}")
+ 
+   
+        f.close()
+        sleep(3)
+ 
+       
+   
+       
+ 

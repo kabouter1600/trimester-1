@@ -12,3 +12,6 @@ File "/home/rpi/programmas/trimester-1/trimester-1/opdracht-bme280.py", line 17,
   File "/usr/local/lib/python3.13/dist-packages/Adafruit_PureIO/spi.py", line 149, in __init__
     raise IOError(f"{device} does not exist")
 OSError: /dev/spidev0.0 does not exist
+
+sudo raspi-config nonint do_spi 0
+sudo reboot

@@ -1,4 +1,3 @@
-
 import time
 import board
 import spidev 
@@ -15,12 +14,16 @@ f.write("Time,Temperature (C),Humidity (%),Pressure (hPa),Altitude (m)\n")
 f.close()
 
 while True:
+
     print(f"\nTemperature: {bme280.temperature:0.1f} C")
     print(f"Humidity: {bme280.relative_humidity:0.1f} %")
     print(f"Pressure: {bme280.pressure:0.1f} hPa")
     print(f"Altitude = {bme280.altitude:0.2f} meters")
+
     huidige_tijd = time.ctime()
+
     f = open("data-bme280.csv","a")
     f.write(f"{huidige_tijd},{bme280.temperature:0.1f},{bme280.relative_humidity:0.1f},{bme280.pressure:0.1f},{bme280.altitude:0.2f}\n")
     f.close()
+
     time.sleep(5)
